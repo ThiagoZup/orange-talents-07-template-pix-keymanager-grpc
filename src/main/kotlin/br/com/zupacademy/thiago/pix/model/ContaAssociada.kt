@@ -1,21 +1,19 @@
 package br.com.zupacademy.thiago.pix.model
 
 import br.com.zupacademy.thiago.pix.model.enums.TipoConta
-import io.micronaut.data.annotation.Embeddable
-import javax.persistence.Embedded
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
+import javax.persistence.Column
+import javax.persistence.Embeddable
 import javax.validation.constraints.NotNull
 
 @Embeddable
-class ContaAssociada(
+class ContaAssociada (
     @field:NotNull
-    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     val tipoConta: TipoConta,
-    @Embedded
-    val instituicao: Instituicao,
+    val instituicao: String,
+    val ispb: String,
     val agencia: String,
     val numero: String,
-    @Embedded
-    val titular: Titular
+    val nomeTitular: String,
+    val cpfTitular: String
 )

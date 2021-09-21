@@ -1,41 +1,75 @@
 package br.com.zupacademy.thiago.pix.registra
 
 import br.com.zupacademy.thiago.*
+import br.com.zupacademy.thiago.pix.exception.ClienteNaoEncontradoException
 import br.com.zupacademy.thiago.pix.model.enums.TipoChave
 import br.com.zupacademy.thiago.pix.model.enums.TipoConta
+import br.com.zupacademy.thiago.pix.repository.ChavePixRepository
 import br.com.zupacademy.thiago.pix.service.NovaChavePixService
+import io.grpc.Status
 import io.grpc.stub.StreamObserver
 
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import javax.validation.ConstraintViolationException
 
 @Singleton
 class RegistraChaveEndpoint(
-    @Inject val service: NovaChavePixService) : KeymanagerRegistraServiceGrpc.KeymanagerRegistraServiceImplBase() {
+    @Inject val service: NovaChavePixService,
+    @Inject val repository: ChavePixRepository
+) : KeymanagerRegistraServiceGrpc.KeymanagerRegistraServiceImplBase() {
 
     override fun registra(
         request: RegistraChavePixRequest?,
         responseObserver: StreamObserver<RegistraChavePixResponse>?
     ) {
-        println("1")
 
-        val novaChaveRequest = request!!.toModel()
-        println("2")
-        val chaveCriada = service.registra(novaChaveRequest)
-        println("3")
+        if(repository.existsByChave(request?.chave)){
+            responseObserver?.onError(
+                Status.ALREADY_EXISTS
+                    .withDescription("Chave ${request?.chave} já registrada")
+                    .asRuntimeException()
+            )
+        }
 
-        responseObserver!!.onNext(RegistraChavePixResponse.newBuilder()
-            .setClientId(chaveCriada.clienteId.toString())
-            .setPixId(chaveCriada.id.toString())
-            .build())
+        try {
+            val novaChaveRequest = request!!.toModel()
+            val chaveCriada = service.registra(novaChaveRequest)
+            if(!chaveCriada.valida()){
+                responseObserver?.onError(
+                    Status.INVALID_ARGUMENT
+                        .withDescription("Chave inválida")
+                        .asRuntimeException()
+                )
+                return
+            }
 
+            repository.save(chaveCriada)
+
+            responseObserver!!.onNext(RegistraChavePixResponse.newBuilder()
+                .setClientId(chaveCriada.clienteId.toString())
+                .setPixId(chaveCriada.id.toString())
+                .build())
+
+        } catch(e: ClienteNaoEncontradoException){
+            responseObserver?.onError(
+                Status.NOT_FOUND
+                    .withDescription(e.message)
+                    .asRuntimeException()
+            )
+        } catch (e: ConstraintViolationException) {
+            responseObserver?.onError(Status.INVALID_ARGUMENT
+                .withDescription("Dados de entrada inválidos")
+                .asRuntimeException())
+            return
+        }
         responseObserver!!.onCompleted()
     }
 
 }
 
-fun RegistraChavePixRequest.toModel() : NovaChavePix {
-    return NovaChavePix(
+fun RegistraChavePixRequest.toModel() : NovaChavePixRequest {
+    return NovaChavePixRequest(
         clienteId = clienteId,
         tipo = when (tipoDeChave) {
             TipoDeChave.UNKNOWN_TIPO_CHAVE -> null
