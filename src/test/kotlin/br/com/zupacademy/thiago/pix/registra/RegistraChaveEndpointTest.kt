@@ -8,11 +8,16 @@ import br.com.zupacademy.thiago.pix.service.ContaResponse
 import br.com.zupacademy.thiago.pix.service.ContasDeClientesNoItauClient
 import br.com.zupacademy.thiago.pix.service.InstituicaoResponse
 import br.com.zupacademy.thiago.pix.service.TitularResponse
+import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import io.micronaut.context.annotation.Factory
+import io.micronaut.grpc.annotation.GrpcChannel
+import io.micronaut.grpc.server.GrpcServerChannel
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -237,4 +242,13 @@ internal class RegistraChaveEndpointTest(
         return Mockito.mock(ContasDeClientesNoItauClient::class.java)
     }
 
+}
+
+@Factory
+class RegistraChaveGrpcClient {
+
+    @Singleton
+    fun blockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel): KeymanagerRegistraServiceGrpc.KeymanagerRegistraServiceBlockingStub{
+        return KeymanagerRegistraServiceGrpc.newBlockingStub(channel)
+    }
 }
