@@ -19,10 +19,10 @@ interface ContasDeClientesNoItauClient {
 @Introspected
 data class ContaResponse(
     val tipo: TipoConta,
-    val instituicao: InstituicaoRequest,
+    val instituicao: InstituicaoResponse,
     val agencia: String,
     val numero: String,
-    val titular: TitularRequest
+    val titular: TitularResponse
 ) {
     fun toModel(): ContaAssociada {
         return ContaAssociada(TipoConta.valueOf(tipo.name), instituicao.nome, instituicao.ispb, agencia, numero, titular.nome, titular.cpf)
@@ -30,13 +30,13 @@ data class ContaResponse(
 }
 
 @Introspected
-data class InstituicaoRequest(
+data class InstituicaoResponse(
     val nome: String,
     val ispb: String
 )
 
 @Introspected
-data class TitularRequest(
+data class TitularResponse(
     val id: String,
     val nome: String,
     val cpf: String
