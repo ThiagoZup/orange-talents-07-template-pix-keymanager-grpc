@@ -121,7 +121,7 @@ internal class RegistraChaveEndpointTest(
             .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
             .build()
 
-        val chavePix = NovaChavePixRequest(clienteId = CLIENTE_ID.toString(), tipo = TipoChave.EMAIL, chave = request.chave, TipoConta.CONTA_CORRENTE)
+        val chavePix = NovaChaveRequest(clienteId = CLIENTE_ID.toString(), tipo = TipoChave.EMAIL, chave = request.chave, TipoConta.CONTA_CORRENTE)
             .toModel(contaAssociada)
 
         repository.save(chavePix)

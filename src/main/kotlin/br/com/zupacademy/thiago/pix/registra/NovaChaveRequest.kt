@@ -11,7 +11,7 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 @Introspected
-data class NovaChavePixRequest(
+data class NovaChaveRequest(
     @field:NotBlank
     val clienteId: String?,
     @field:NotNull

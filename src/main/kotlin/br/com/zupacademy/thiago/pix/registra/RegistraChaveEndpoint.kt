@@ -5,7 +5,7 @@ import br.com.zupacademy.thiago.pix.exception.ClienteNaoEncontradoException
 import br.com.zupacademy.thiago.pix.model.enums.TipoChave
 import br.com.zupacademy.thiago.pix.model.enums.TipoConta
 import br.com.zupacademy.thiago.pix.repository.ChavePixRepository
-import br.com.zupacademy.thiago.pix.service.NovaChavePixService
+import br.com.zupacademy.thiago.pix.service.RegistraChaveService
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
 
@@ -15,7 +15,7 @@ import javax.validation.ConstraintViolationException
 
 @Singleton
 class RegistraChaveEndpoint(
-    @Inject val service: NovaChavePixService,
+    @Inject val service: RegistraChaveService,
     @Inject val repository: ChavePixRepository
 ) : KeymanagerRegistraServiceGrpc.KeymanagerRegistraServiceImplBase() {
 
@@ -57,6 +57,7 @@ class RegistraChaveEndpoint(
                     .withDescription(e.message)
                     .asRuntimeException()
             )
+            return
         } catch (e: ConstraintViolationException) {
             responseObserver?.onError(Status.INVALID_ARGUMENT
                 .withDescription("Dados de entrada inválidos")
@@ -68,8 +69,8 @@ class RegistraChaveEndpoint(
 
 }
 
-fun RegistraChavePixRequest.toModel() : NovaChavePixRequest {
-    return NovaChavePixRequest(
+fun RegistraChavePixRequest.toModel() : NovaChaveRequest {
+    return NovaChaveRequest(
         clienteId = clienteId,
         tipo = when (tipoDeChave) {
             TipoDeChave.UNKNOWN_TIPO_CHAVE -> null

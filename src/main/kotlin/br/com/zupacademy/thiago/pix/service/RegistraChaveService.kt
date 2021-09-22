@@ -2,17 +2,16 @@ package br.com.zupacademy.thiago.pix.service
 
 import br.com.zupacademy.thiago.pix.exception.ClienteNaoEncontradoException
 import br.com.zupacademy.thiago.pix.model.ChavePix
-import br.com.zupacademy.thiago.pix.registra.NovaChavePixRequest
-import br.com.zupacademy.thiago.pix.repository.ChavePixRepository
+import br.com.zupacademy.thiago.pix.registra.NovaChaveRequest
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import javax.validation.Valid
 
 @Singleton
-open class NovaChavePixService(
+open class RegistraChaveService(
     @Inject val itauClient: ContasDeClientesNoItauClient) {
 
-    open fun registra(@Valid novaChaveRequest: NovaChavePixRequest): ChavePix {
+    open fun registra(@Valid novaChaveRequest: NovaChaveRequest): ChavePix {
 
         try {
             val response = itauClient.buscaContaPorTipo(
