@@ -1,6 +1,7 @@
 package br.com.zupacademy.thiago.pix.registra
 
 import br.com.zupacademy.thiago.*
+import br.com.zupacademy.thiago.pix.model.enums.TipoChave
 import br.com.zupacademy.thiago.pix.model.enums.TipoConta
 import br.com.zupacademy.thiago.pix.repository.ChavePixRepository
 import br.com.zupacademy.thiago.pix.service.ContaResponse
@@ -54,7 +55,7 @@ internal class RegistraChaveEndpointTest(
         val response = grpcClient.registra(RegistraChavePixRequest.newBuilder()
             .setClienteId(CLIENTE_ID.toString())
             .setTipoDeChave(TipoDeChave.EMAIL)
-            .setChave("thiago@zup.com")
+            .setChave("zupperson@zup.com")
             .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
             .build())
 
@@ -77,7 +78,7 @@ internal class RegistraChaveEndpointTest(
                 RegistraChavePixRequest.newBuilder()
                     .setClienteId(CLIENTE_ID.toString())
                     .setTipoDeChave(TipoDeChave.EMAIL)
-                    .setChave("thiago.zup.com")
+                    .setChave("zupperson.zup.com")
                     .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
                     .build()
             )
@@ -104,6 +105,31 @@ internal class RegistraChaveEndpointTest(
             assertEquals(CLIENTE_ID.toString(), this.clientId)
             assertNotNull(pixId)
         }
+    }
+
+    @Test
+    fun `nao deve registrar chave pix repetida`() {
+        Mockito.`when`(itauClient.buscaContaPorTipo(clienteId = CLIENTE_ID.toString(), tipo = "CONTA_CORRENTE"))
+            .thenReturn(contaResponse)
+
+        val contaAssociada = contaResponse.toModel()
+
+        var request = RegistraChavePixRequest.newBuilder()
+            .setClienteId(CLIENTE_ID.toString())
+            .setTipoDeChave(TipoDeChave.EMAIL)
+            .setChave("zupperson@zup.com")
+            .setTipoDeConta(TipoDeConta.CONTA_CORRENTE)
+            .build()
+
+        val chavePix = NovaChavePixRequest(clienteId = CLIENTE_ID.toString(), tipo = TipoChave.EMAIL, chave = request.chave, TipoConta.CONTA_CORRENTE)
+            .toModel(contaAssociada)
+
+        repository.save(chavePix)
+
+        val error = org.junit.jupiter.api.assertThrows<StatusRuntimeException> {
+            grpcClient.registra(request)
+        }
+        assertEquals(Status.ALREADY_EXISTS.code, error.status.code)
     }
 
     @Test
