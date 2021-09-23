@@ -39,6 +39,12 @@ class RemoveChaveEndpoint(@Inject private val service: RemoveChaveService): Keym
                 .withDescription("Dados de entrada inválidos")
                 .asRuntimeException())
             return
+        } catch (e: IllegalStateException) {
+            responseObserver?.onError(
+                Status.UNAVAILABLE
+                    .withDescription(e.message)
+                    .asRuntimeException())
+            return
         }
         responseObserver!!.onCompleted()
     }

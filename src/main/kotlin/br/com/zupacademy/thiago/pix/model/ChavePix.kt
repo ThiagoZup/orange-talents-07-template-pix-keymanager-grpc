@@ -42,4 +42,9 @@ class ChavePix(
         return this.tipoChave.valida(this.chave)
     }
 
+    fun atualiza(chave: String){
+        if(this.tipoChave == TipoChave.ALEATORIA){
+            this.chave = chave
+        }
+    }
 }

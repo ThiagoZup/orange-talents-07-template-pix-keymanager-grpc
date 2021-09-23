@@ -13,7 +13,7 @@ interface ContasDeClientesNoItauClient {
 
     @Get(value = "/{clienteId}/contas")
     fun buscaContaPorTipo(@PathVariable(value = "clienteId") clienteId: String,
-                          @QueryValue(value = "tipo") tipo: String ): ContaResponse
+                          @QueryValue(value = "tipo") tipo: String ): ContaResponse?
 }
 
 @Introspected

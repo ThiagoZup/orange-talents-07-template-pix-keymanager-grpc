@@ -44,8 +44,6 @@ class RegistraChaveEndpoint(
                 return
             }
 
-            repository.save(chaveCriada)
-
             responseObserver!!.onNext(RegistraChavePixResponse.newBuilder()
                 .setClientId(chaveCriada.clienteId.toString())
                 .setPixId(chaveCriada.id.toString())
@@ -61,6 +59,11 @@ class RegistraChaveEndpoint(
         } catch (e: ConstraintViolationException) {
             responseObserver?.onError(Status.INVALID_ARGUMENT
                 .withDescription("Dados de entrada inválidos")
+                .asRuntimeException())
+            return
+        } catch (e: IllegalArgumentException) {
+            responseObserver?.onError(Status.INVALID_ARGUMENT
+                .withDescription(e.message)
                 .asRuntimeException())
             return
         }
