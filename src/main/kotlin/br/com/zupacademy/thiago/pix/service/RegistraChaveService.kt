@@ -40,10 +40,10 @@ open class RegistraChaveService(
 
         // Registra no BCB
         val bcbRequest = CreatePixKeyRequest.of(chave)
-        println(bcbRequest)
+
         val bcbResponse = bcbClient.create(bcbRequest)
-        println(bcbResponse)
-       if(bcbResponse.status != HttpStatus.CREATED){
+
+        if(bcbResponse.status != HttpStatus.CREATED){
             throw IllegalStateException("Erro ao registrar chave Pix no Banco Central")
         }
         chave.atualiza(bcbResponse.body()!!.key)

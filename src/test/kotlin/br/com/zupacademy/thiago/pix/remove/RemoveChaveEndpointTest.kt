@@ -1,6 +1,9 @@
 package br.com.zupacademy.thiago.pix.remove
 
 import br.com.zupacademy.thiago.*
+import br.com.zupacademy.thiago.integration.bcb.BancoCentralClient
+import br.com.zupacademy.thiago.integration.bcb.DeletePixKeyRequest
+import br.com.zupacademy.thiago.integration.bcb.DeletePixKeyResponse
 import br.com.zupacademy.thiago.pix.model.ChavePix
 import br.com.zupacademy.thiago.pix.model.ContaAssociada
 import br.com.zupacademy.thiago.pix.model.enums.TipoChave
@@ -13,11 +16,16 @@ import io.grpc.StatusRuntimeException
 import io.micronaut.context.annotation.Factory
 import io.micronaut.grpc.annotation.GrpcChannel
 import io.micronaut.grpc.server.GrpcServerChannel
+import io.micronaut.http.HttpResponse
+import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.*
+import java.time.LocalDateTime
 import java.util.*
 
 @MicronautTest(transactional = false)
@@ -26,6 +34,8 @@ internal class RemoveChaveEndpointTest(
     val grpcClient: KeymanagerRemoveServiceGrpc.KeymanagerRemoveServiceBlockingStub
 ){
 
+    @Inject
+    lateinit var bcbClient: BancoCentralClient
     lateinit var CHAVE_EXISTENTE: ChavePix
 
     @BeforeEach
@@ -51,6 +61,12 @@ internal class RemoveChaveEndpointTest(
 
     @Test
     fun `deve remover chave pix`() {
+
+        `when`(bcbClient.delete(CHAVE_EXISTENTE.chave, DeletePixKeyRequest(CHAVE_EXISTENTE.chave)))
+            .thenReturn(HttpResponse.ok(DeletePixKeyResponse(key = CHAVE_EXISTENTE.chave,
+                    participant = ContaAssociada.ITAU_UNIBANCO_ISPB,
+                    deletedAt = LocalDateTime.now()))
+        )
 
         val response = grpcClient.remove(
             RemoveChavePixRequest.newBuilder()
@@ -92,6 +108,11 @@ internal class RemoveChaveEndpointTest(
             )
         }
         assertEquals(Status.NOT_FOUND.code, error.status.code)
+    }
+
+    @MockBean(BancoCentralClient::class)
+    fun bcbClient(): BancoCentralClient? {
+        return mock(BancoCentralClient::class.java)
     }
 }
 
