@@ -10,6 +10,7 @@ import io.grpc.Status
 import io.grpc.stub.StreamObserver
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import javax.validation.ConstraintViolationException
 import javax.validation.Validator
 
 @Singleton
@@ -43,7 +44,13 @@ class CarregaChaveEndpoint(
         } catch (e: IllegalArgumentException) {
             responseObserver?.onError(
                 Status.INVALID_ARGUMENT
-                    .withDescription("Dados de entrada inválidos")
+                    .withDescription(e.message)
+                    .asRuntimeException())
+            return
+        } catch (e: ConstraintViolationException) {
+            responseObserver?.onError(
+                Status.INVALID_ARGUMENT
+                    .withDescription(e.message)
                     .asRuntimeException())
             return
         }

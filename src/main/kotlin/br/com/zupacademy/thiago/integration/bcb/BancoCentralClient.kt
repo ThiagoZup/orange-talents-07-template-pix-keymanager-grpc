@@ -5,6 +5,7 @@ import br.com.zupacademy.thiago.pix.model.ChavePix
 import br.com.zupacademy.thiago.pix.model.ContaAssociada
 import br.com.zupacademy.thiago.pix.model.enums.TipoChave
 import br.com.zupacademy.thiago.pix.model.enums.TipoConta
+import io.micronaut.core.annotation.Introspected
 import io.micronaut.http.HttpResponse
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*

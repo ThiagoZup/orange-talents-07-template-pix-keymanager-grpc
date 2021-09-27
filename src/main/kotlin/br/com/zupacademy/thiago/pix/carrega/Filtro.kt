@@ -21,8 +21,8 @@ sealed class Filtro {
 
     @Introspected
     data class PorPixId(
-        @field:NotBlank  @ValidUUID val clienteId: String,
-        @field:NotBlank  @ValidUUID val pixId: String
+        @ValidUUID val clienteId: String,
+        @ValidUUID val pixId: String
     ) : Filtro() {
 
         fun pixIdAsUuid() = UUID.fromString(pixId)
