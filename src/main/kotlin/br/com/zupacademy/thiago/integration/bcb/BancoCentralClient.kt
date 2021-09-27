@@ -1,5 +1,6 @@
 package br.com.zupacademy.thiago.integration.bcb
 
+import br.com.zupacademy.thiago.pix.carrega.ChavePixInfo
 import br.com.zupacademy.thiago.pix.model.ChavePix
 import br.com.zupacademy.thiago.pix.model.ContaAssociada
 import br.com.zupacademy.thiago.pix.model.enums.TipoChave
@@ -88,7 +89,11 @@ data class PixKeyDetailResponse(
         return ChavePixInfo(
             tipo = keyType.domainType!!,
             chave = this.key,
-            conta = ContaAssociadaInfo(
+            tipoConta = when (this.bankAccount.accountType) {
+                BankAccount.AccountType.CACC -> TipoConta.CONTA_CORRENTE
+                BankAccount.AccountType.SVGS -> TipoConta.CONTA_POUPANCA
+            },
+            conta = ContaAssociada(
                 tipoConta = when (this.bankAccount.accountType) {
                     BankAccount.AccountType.CACC -> TipoConta.CONTA_CORRENTE
                     BankAccount.AccountType.SVGS -> TipoConta.CONTA_POUPANCA
@@ -97,27 +102,12 @@ data class PixKeyDetailResponse(
                 agencia = bankAccount.branch,
                 numero = bankAccount.accountNumber,
                 nomeTitular = owner.name,
-                cpfTitular = owner.taxIdNumber
+                cpfTitular = owner.taxIdNumber,
+                ispb = bankAccount.participant
             )
         )
     }
 }
-
-data class ChavePixInfo(
-    val tipo: TipoChave,
-    val chave: String,
-    val conta: ContaAssociadaInfo,
-
-)
-
-data class ContaAssociadaInfo(
-    val tipoConta: TipoConta,
-    val instituicao: String,
-    val agencia: String,
-    val numero: String,
-    val nomeTitular: String,
-    val cpfTitular: String
-)
 
 data class CreatePixKeyResponse(
     val keyType: PixKeyType,

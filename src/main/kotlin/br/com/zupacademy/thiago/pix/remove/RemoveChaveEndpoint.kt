@@ -1,10 +1,7 @@
 package br.com.zupacademy.thiago.pix.remove
 
-import br.com.zupacademy.thiago.KeymanagerRemoveServiceGrpc
-import br.com.zupacademy.thiago.RemoveChavePixRequest
-import br.com.zupacademy.thiago.RemoveChavePixResponse
+import br.com.zupacademy.thiago.*
 import br.com.zupacademy.thiago.pix.exception.ChavePixNaoEncontradaException
-import br.com.zupacademy.thiago.pix.exception.ClienteNaoEncontradoException
 import br.com.zupacademy.thiago.pix.service.RemoveChaveService
 import io.grpc.Status
 import io.grpc.stub.StreamObserver
@@ -15,7 +12,7 @@ import javax.validation.ConstraintViolationException
 @Singleton
 class RemoveChaveEndpoint(@Inject private val service: RemoveChaveService): KeymanagerRemoveServiceGrpc.KeymanagerRemoveServiceImplBase() {
 
-    override fun remove(
+    override fun remove (
         request: RemoveChavePixRequest?,
         responseObserver: StreamObserver<RemoveChavePixResponse>?) {
 
