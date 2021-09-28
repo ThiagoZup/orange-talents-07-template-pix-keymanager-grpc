@@ -2,6 +2,7 @@ package br.com.zupacademy.thiago.pix.lista
 
 import br.com.zupacademy.thiago.*
 import br.com.zupacademy.thiago.pix.repository.ChavePixRepository
+import br.com.zupacademy.thiago.shared.handler.ErrorHandler
 import com.google.protobuf.Timestamp
 import io.grpc.stub.StreamObserver
 import jakarta.inject.Inject
@@ -9,6 +10,8 @@ import jakarta.inject.Singleton
 import java.time.ZoneId
 import java.util.*
 
+
+@ErrorHandler
 @Singleton
 class ListaChavesEndpoint(@Inject private val repository : ChavePixRepository)
     : KeymanagerListaServiceGrpc.KeymanagerListaServiceImplBase() {
